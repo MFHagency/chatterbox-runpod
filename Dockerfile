@@ -1,14 +1,19 @@
-FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
+FROM nvidia/cuda:12.4.1-devel-ubuntu22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+
+RUN apt-get update && apt-get install -y python3.11 python3-pip git ffmpeg && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir --upgrade transformers>=4.45.0
+# Install Chatterbox (brings torch 2.6.0, transformers 5.2.0, etc.)
+RUN pip3 install --no-cache-dir git+https://github.com/resemble-ai/chatterbox.git
 
-RUN pip install --no-cache-dir runpod
+# Install runpod SDK
+RUN pip3 install --no-cache-dir runpod
 
-RUN pip install --no-cache-dir git+https://github.com/resemble-ai/chatterbox.git
-
-# Pre-download model at build time so cold starts are fast
+# Pre-download model at build time
 RUN python3 -c "from chatterbox.tts import ChatterboxTTS; ChatterboxTTS.from_pretrained(device='cpu')" || true
 
 COPY handler.py /app/handler.py
