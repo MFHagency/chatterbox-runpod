@@ -10,6 +10,8 @@ RUN pip install --no-cache-dir runpod && \
     accelerate sentencepiece protobuf
 
 RUN python -c "from chatterbox.tts_turbo import ChatterboxTurboTTS; ChatterboxTurboTTS.from_pretrained(device='cpu')"
+RUN python -c "from chatterbox.mtl_tts import ChatterboxMultilingualTTS; ChatterboxMultilingualTTS.from_pretrained(device='cpu')"
 
 COPY handler.py /handler.py
 CMD ["python", "-u", "/handler.py"]
+
